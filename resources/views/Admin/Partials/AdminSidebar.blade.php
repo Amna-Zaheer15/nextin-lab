@@ -11,7 +11,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('admin.courses') }}" class="flex items-center p-3 rounded hover:bg-green-800 transition-colors text-sm">
+                <a href="{{ route('admin.course') }}" class="flex items-center p-3 rounded hover:bg-green-800 transition-colors text-sm">
                     <i class="fas fa-book mr-3"></i>
                     Courses
                 </a>

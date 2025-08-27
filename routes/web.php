@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CourseController; // Add this line to import the CourseController
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ProjectController; 
+use App\Http\Controllers\TemplateController; 
+use App\Http\Controllers\LabController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -58,15 +61,55 @@ Route::prefix('admin')->group(function() {
     //Route::get('/admincourses', [CourseController::class, 'showAdminCourses'])->name('admin.courses');
     Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
     Route::get('/courses', [CourseController::class, 'index'])->name('admin.courses');
-    Route::get('/course', [CourseController::class, 'showAdminCourses'])->name('admin.course');
+    Route::get('/course/{id?}', [CourseController::class, 'showAdminCourses'])->name('admin.course');
+
+    // Courses routes
+Route::get('/courses/create', [CourseController::class, 'create'])->name('courses.create');
+Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])->name('courses.edit');
+Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
+  // Use PUT method for updates and include the course ID parameter
+Route::put('/courses/{id}', [CourseController::class, 'update'])->name('courses.update');
+    // Store or update course
+
+    // In routes/web.php
     Route::delete('/course/{course}', [CourseController::class, 'destroy'])->name('admin.deletecourse');
     
-    Route::put('/course/{id}', [CourseController::class, 'update'])->name('admin.updatecourse');
+    // Route::post('/course/{id}', [CourseController::class, 'update'])->name('admin.updatecourse');
 
 
 Route::get('/coursedetail/{id}', [CourseController::class, 'show'])->name('courses.detail');
 
 Route::get('/coursedetail/{id}/{topic}', [CourseController::class, 'topicContent'])->name('topic.detail');
- 
+
+
+//projects routes
+
+Route::get('/adminprojects', [ProjectController::class, 'index'])->name('admin.projects');
+Route::get('/addeditprojects', [ProjectController::class, 'create'])->name('addeditprojects.create');
+Route::get('/addeditprojects/{id}', [ProjectController::class, 'edit'])->name('addeditprojects.edit');
+Route::get('/viewprojects/{id}', [ProjectController::class, 'show'])->name('viewprojects.show');
+
+
+
+
+// templates 
+// Route::get('/admintemplates', [TemplateController::class, 'get'])->name('admin.templates');
+
+Route::get('/admintemplates', [TemplateController::class, 'index'])->name('admin.templates');
+Route::get('/addedittemplates', [TemplateController::class, 'create'])->name('addedittemplates.create');
+Route::get('/addedittemplates/{id}', [TemplateController::class, 'edit'])->name('addedittemplates.edit');
+Route::get('/viewtemplates/{id}', [TemplateController::class, 'show'])->name('viewtemplates.show');
+
+// Lab Routes
+Route::get('/admin/lab', [LabController::class, 'index'])->name('admin.lab');
+
+// Lab Routes
+Route::get('/admin/lab/create', [LabController::class, 'create'])->name('addeditlab.create');
+Route::post('/admin/lab/store', [LabController::class, 'store'])->name('addeditlab.store');
+Route::get('/admin/lab/{id}/edit', [LabController::class, 'edit'])->name('addeditlab.edit');
+Route::put('/admin/lab/{id}/update', [LabController::class, 'update'])->name('addeditlab.update');
+Route::delete('/admin/lab/{id}/delete', [LabController::class, 'destroy'])->name('addeditlab.delete');
+Route::get('/admin/lab/{id}', [LabController::class, 'show'])->name('viewlab.show');
 });
+ 
 
