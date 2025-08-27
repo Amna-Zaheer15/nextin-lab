@@ -12,17 +12,17 @@ class CourseController extends Controller
      * Display a listing of the courses.
      */
     public function showAdminCourses($id = null)
-{
-    if ($id) {
-        // Return a single course
-        $course = Course::findOrFail($id);
-        return response()->json($course);
+    {
+        if ($id) {
+            // Return a single course
+            $course = Course::findOrFail($id);
+            return response()->json($course);
+        }
+        
+        // Return all courses for the admin view
+        $courses = Course::all();
+        return view('admin.adminpages.admincourse', compact('courses'));
     }
-    
-    // Return all courses for the admin view
-    $courses = Course::all();
-    return view('admin.adminpages.admincourse', compact('courses'));
-}
     
     public function index()
     {
@@ -38,16 +38,16 @@ class CourseController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'instructor' => 'required|string|max:255',
-            'description' => 'nullable|string', // Added validation for description
-            'topics' => 'nullable|string',      // Added validation for topics
+            'description' => 'nullable|string',
+            'topics' => 'nullable|string',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'views' => 'nullable|integer',      // Changed from string to integer
-            'time' => 'nullable|integer',       // Changed from number to integer
+            'views' => 'nullable|integer',
+            'time' => 'nullable|integer',
             'category' => 'required|string|max:100',
             'level' => 'required|string|max:100',
-            'duration' => 'nullable|integer',   // Changed from number to integer
+            'duration' => 'nullable|integer',
             'lessons' => 'nullable|integer',
-            'price' => 'nullable|integer',      // Changed from number to integer
+            'price' => 'nullable|integer',
         ]);
 
         $courseData = $validated;
@@ -70,63 +70,83 @@ class CourseController extends Controller
      */
     public function show($id)
     {
-        // Fetch the course by ID or throw a 404 error if not found
         $course = Course::findOrFail($id);
-        // Return the view with the course data
         return view('pages.CourseDetail', compact('course'));
     }
+
+    /**
+     * Show the form for creating a new course.
+     */
+    public function create()
+    {
+        return view('admin.adminpages.AddCourse');
+    }
+   /**
+     * Show the form for editing an existing course.
+     */
+    public function edit($id)
+    {
+    
+        try {
+            $course = Course::findOrFail($id);
+            \Log::info("Editing course with ID: {$course->id}");
+            return view('admin.adminpages.EditCourse', compact('course'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            \Log::error("Course not found for ID: {$id}");
+            return redirect()->route('admin.courses')->with('error', 'Course not found.');
+        }
+    }
+
+
 
 
     /**
      * Update the specified course in storage.
      */
-    public function update(Request $request, Course $course)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'instructor' => 'required|string|max:255',
-            'description' => 'nullable|string', // Added validation for description
-            'topics' => 'nullable|string',      // Added validation for topics
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'views' => 'nullable|integer',      // Changed from string to integer
-            'time' => 'nullable|integer',       // Changed from string to integer
-            'category' => 'required|string|max:100',
-            'level' => 'required|string|max:100',
-            'duration' => 'nullable|integer',   // Changed from string to integer
-            'lessons' => 'nullable|integer',
-            'price' => 'nullable|integer',      // Changed from string to integer
-        ]);
+public function update(Request $request, $id)
+{
+    // Find the course
+    $course = Course::findOrFail($id);
+    
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'instructor' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'topics' => 'nullable|string',
+        'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'views' => 'nullable|integer',
+        'time' => 'nullable|integer',
+        'category' => 'required|string|max:100',
+        'level' => 'required|string|max:100',
+        'duration' => 'nullable|integer',
+        'lessons' => 'nullable|integer',
+        'price' => 'nullable|integer',
+    ]);
 
-        $courseData = $validated;
+    $courseData = $validated;
 
-        if ($request->hasFile('thumbnail')) {
-            // Delete old thumbnail if exists
-            if ($course->thumbnail) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $course->thumbnail));
-            }
-            $path = $request->file('thumbnail')->store('thumbnails', 'public');
-            $courseData['thumbnail'] = Storage::url($path);
+    if ($request->hasFile('thumbnail')) {
+        if ($course->thumbnail) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $course->thumbnail));
         }
-
-        $course->update($courseData);
-
-        return response()->json([
-            'message' => 'Course updated successfully',
-            'course' => $course
-        ]);
+        $path = $request->file('thumbnail')->store('thumbnails', 'public');
+        $courseData['thumbnail'] = Storage::url($path);
     }
+
+    $course->update($courseData);
+
+    return redirect()->route('admin.course')->with('success', 'Course updated successfully');
+}
 
     /**
      * Remove the specified course from storage.
      */
     public function destroy(Course $course)
     {
-        // Delete the thumbnail if it exists
         if ($course->thumbnail) {
             Storage::disk('public')->delete(str_replace('/storage/', '', $course->thumbnail));
         }
         
-        // Delete the course
         $course->delete();
         
         return response()->json([
