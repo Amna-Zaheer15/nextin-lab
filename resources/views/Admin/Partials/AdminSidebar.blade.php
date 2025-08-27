@@ -1,4 +1,3 @@
-
 <div class="sidebar p-4 font-poppins bg-green-900 text-white">
     <h1 class="text-3xl font-extrabold mb-6 text-white">Admin Panel</h1>
     

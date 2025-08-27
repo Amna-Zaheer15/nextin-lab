@@ -1,60 +1,70 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6 font-poppins">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-semibold text-gray-800">Project Details</h1>
-            <a href="{{ route('admin.projects') }}" class="flex items-center text-gray-600 hover:text-gray-900 text-sm">
-                <i class="fas fa-arrow-left mr-1"></i> Back to Projects
-            </a>
-        </div>
-
-        <div class="space-y-6">
-            <div class="border-b border-gray-200 pb-6">
-                <h2 class="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                    <i class="fas fa-image mr-2 text-green-600"></i> Project Information
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                        <p class="text-sm text-gray-900">{{ $project->title }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Technology</label>
-                        <p class="text-sm text-gray-900">{{ $project->technology }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
-                        <p class="text-sm text-gray-900">{{ $project->price }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <span class="text-sm text-white px-3 py-1 rounded-full {{ $project->status == 'active' ? 'bg-green-600' : 'bg-red-600' }}">
-                            {{ ucfirst($project->status) }}
-                        </span>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
-                        <p class="text-sm text-gray-900">{{ $project->short_description }}</p>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Description</label>
-                        <p class="text-sm text-gray-900">{{ $project->full_description }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Downloads</label>
-                        <p class="text-sm text-gray-900">{{ $project->downloads }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Purchases</label>
-                        <p class="text-sm text-gray-900">{{ $project->purchases }}</p>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
-                        <img src="{{ $project->image_url }}" alt="Project Image" class="w-48 h-28 object-cover rounded">
-                    </div>
-                </div>
+    <div class="bg-white rounded-lg shadow-md p-6 font-poppins">
+        <h1 class="text-xl font-semibold text-gray-800 mb-6">View Project: {{ $project->title }}</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium">Title</label>
+                <p>{{ $project->title }}</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium">Technology</label>
+                <p>{{ $project->technology }}</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium">Price</label>
+                <p>{{ $project->price }}</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium">Status</label>
+                <p>{{ ucfirst($project->status) }}</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium">Short Description</label>
+                <p>{{ $project->short_description }}</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium">Full Description</label>
+                <p>{{ $project->full_description ?? 'N/A' }}</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium">Image</label>
+                <img src="{{ $project->image_url }}" alt="{{ $project->title }}" class="w-32 h-20 object-cover rounded">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium">Downloads</label>
+                <p>{{ $project->downloads }}</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium">Purchases</label>
+                <p>{{ $project->purchases }}</p>
             </div>
         </div>
+        <a href="{{ route('admin.projects') }}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-transform transform hover:scale-105 text-sm">Back to Projects</a>
     </div>
+
+    <style>
+        .font-poppins {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .bg-white.rounded-lg {
+                padding: 1rem;
+            }
+
+            .text-xl.font-semibold {
+                font-size: 1.25rem;
+            }
+
+            .text-sm {
+                font-size: 0.75rem;
+            }
+
+            .text-xs {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
 @endsection

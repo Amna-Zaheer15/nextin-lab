@@ -2,11 +2,15 @@
 
 @section('content')
     <div class="bg-white rounded-lg shadow-md p-6 mb-6 font-poppins">
+        @if (session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
+
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-xl font-semibold text-gray-800">Admin Projects</h1>
-            <a href="{{ route('addeditprojects.create') }}" class="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800 transition-transform transform hover:scale-105 text-sm">
-                <i class="fas fa-plus mr-2"></i> Add New Project
-            </a>
+            <a href="{{ route('addeditprojects') }}" class="bg-green-700 text-white px-4 py-2 rounded-lg">Add New Project</a>
         </div>
 
         <div class="overflow-x-auto">
@@ -21,55 +25,31 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Project 1 -->
-                    <tr class="hover:bg-gray-100 text-gray-800 text-sm">
-                        <td class="p-3 border-b border-gray-200">Student App : NodeJS ExpressJS & MongoDB CRUD API Project</td>
-                        <td class="p-3 border-b border-gray-200">The Students CRUD App is a web-based application...</td>
-                        <td class="p-3 border-b border-gray-200">
-                            <span class="bg-green-600 text-white px-3 py-1 rounded-full text-xs">Active</span>
-                        </td>
-                        <td class="p-3 border-b border-gray-200">
-                            <img src="https://www.yahubaba.com/public/projects/student-app-:-nodejs-expressjs-&-mongodb-crud-api-project.png" alt="Student App" class="w-24 h-14 object-cover rounded">
-                        </td>
-                        <td class="p-3 border-b border-gray-200 flex space-x-3">
-                            <a href="{{ route('addeditprojects.edit', 1) }}" class="text-green-700 hover:text-green-900 transition-transform transform hover:scale-110" title="Edit"><i class="fas fa-edit"></i></a>
-                            <a href="{{ route('viewprojects.show', 1) }}" class="text-green-700 hover:text-green-900 transition-transform transform hover:scale-110" title="View"><i class="fas fa-eye"></i></a>
-                            <a href="/admin/projects/1" class="text-red-600 hover:text-red-800 transition-transform transform hover:scale-110" title="Delete" onclick="return confirm('Are you sure you want to delete this project?')"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
-                    <!-- Project 2 -->
-                    <tr class="hover:bg-gray-100 text-gray-800 text-sm">
-                        <td class="p-3 border-b border-gray-200">Contact App : NodeJS ExpressJS & MongoDB CRUD Project</td>
-                        <td class="p-3 border-b border-gray-200">In this new project you will get the code of complete nodejs, expressjs and mon...</td>
-                        <td class="p-3 border-b border-gray-200">
-                            <span class="bg-green-600 text-white px-3 py-1 rounded-full text-xs">Active</span>
-                        </td>
-                        <td class="p-3 border-b border-gray-200">
-                            <img src="https://www.yahubaba.com/public/projects/contact-app-:-nodejs-expressjs-&-mongodb-crud-project.png" alt="Contact App" class="w-24 h-14 object-cover rounded">
-                        </td>
-                        <td class="p-3 border-b border-gray-200 flex space-x-3">
-                            <a href="{{ route('addeditprojects.edit', 2) }}" class="text-green-700 hover:text-green-900 transition-transform transform hover:scale-110" title="Edit"><i class="fas fa-edit"></i></a>
-                            <a href="{{ route('viewprojects.show', 2) }}" class="text-green-700 hover:text-green-900 transition-transform transform hover:scale-110" title="View"><i class="fas fa-eye"></i></a>
-                            <a href="/admin/projects/2" class="text-red-600 hover:text-red-800 transition-transform transform hover:scale-110" title="Delete" onclick="return confirm('Are you sure you want to delete this project?')"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
-                    <!-- Project 3 -->
-                    <tr class="hover:bg-gray-100 text-gray-800 text-sm">
-                        <td class="p-3 border-b border-gray-200">Contact App HTML Template</td>
-                        <td class="p-3 border-b border-gray-200">Responsive contact form with validation for websites.</td>
-                        <td class="p-3 border-b border-gray-200">
-                            <span class="bg-green-600 text-white px-3 py-1 rounded-full text-xs">Active</span>
-                        </td>
-                        <td class="p-3 border-b border-gray-200">
-                            <img src="https://www.yahubaba.com/public/projects/contact-app-html-template.png" alt="Contact App HTML Template" class="w-24 h-14 object-cover rounded">
-                        </td>
-                        <td class="p-3 border-b border-gray-200 flex space-x-3">
-                            <a href="{{ route('addeditprojects.edit', 3) }}" class="text-green-700 hover:text-green-900 transition-transform transform hover:scale-110" title="Edit"><i class="fas fa-edit"></i></a>
-                            <a href="{{ route('viewprojects.show', 3) }}" class="text-green-700 hover:text-green-900 transition-transform transform hover:scale-110" title="View"><i class="fas fa-eye"></i></a>
-                            <a href="/admin/projects/3" class="text-red-600 hover:text-red-800 transition-transform transform hover:scale-110" title="Delete" onclick="return confirm('Are you sure you want to delete this project?')"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
-                    <!-- Project 4 to 10 would follow the same pattern -->
+                    @forelse($projects as $project)
+                        <tr class="hover:bg-gray-100 text-gray-800 text-sm">
+                            <td class="p-3 border-b border-gray-200">{{ $project->title }}</td>
+                            <td class="p-3 border-b border-gray-200">{{ $project->short_description }}</td>
+                            <td class="p-3 border-b border-gray-200">
+                                <span class="bg-green-600 text-white px-3 py-1 rounded-full text-xs">{{ ucfirst($project->status) }}</span>
+                            </td>
+                            <td class="p-3 border-b border-gray-200">
+                                <img src="{{ $project->image_url }}" alt="{{ $project->title }}" class="w-24 h-14 object-cover rounded">
+                            </td>
+                            <td class="p-3 border-b border-gray-200 flex space-x-3">
+                                <a href="{{ route('addeditprojects', $project->id) }}" class="text-green-700 hover:text-green-900 transition-transform transform hover:scale-110" title="Edit"><i class="fas fa-edit"></i></a>
+                                <a href="{{ route('viewprojects.show', $project->id) }}" class="text-green-700 hover:text-green-900 transition-transform transform hover:scale-110" title="View"><i class="fas fa-eye"></i></a>
+                                <form action="{{ route('projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this project?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:text-red-800 transition-transform transform hover:scale-110" title="Delete"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="p-3 text-center text-gray-600">No projects found.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
