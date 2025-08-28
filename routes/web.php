@@ -49,7 +49,9 @@ Route::get('/courses', function () {
     return view('pages.courses');
 });
 
-
+Route::get('/coursecontent', function () {
+    return view('pages.coursecontent');
+});
 
 // Course detail page
 
@@ -88,7 +90,8 @@ Route::get('/courses/{course}/edit', [CourseController::class, 'edit'])->name('c
 Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
   // Use PUT method for updates and include the course ID parameter
 Route::put('/courses/{id}', [CourseController::class, 'update'])->name('courses.update');
-
+// view course
+Route::get('/courses/{id}', [CourseController::class, 'ViewCourse'])->name('courses.show');
 
 // Project Routes
 Route::get('/adminprojects', [ProjectController::class, 'index'])->name('admin.projects');

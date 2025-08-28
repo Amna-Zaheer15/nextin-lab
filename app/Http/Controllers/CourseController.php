@@ -68,10 +68,19 @@ class CourseController extends Controller
     /**
      * Display the specified course.
      */
-    public function show($id)
+    public function ViewCourse($id)
     {
+        
         $course = Course::findOrFail($id);
-        return view('pages.CourseDetail', compact('course'));
+        return view('Admin.AdminPages.ViewCourse', compact('course'));
+    }
+
+     public function show($id)
+    {
+        
+        $course = Course::findOrFail($id);
+        
+        return view('pages.coursedetail', compact('course'));
     }
 
     /**

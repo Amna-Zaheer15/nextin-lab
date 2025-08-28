@@ -398,7 +398,7 @@
                     </div>
                 @endif
 
-             <div class="course-description">
+                <div class="course-description">
                     <h2>Course Description</h2>
                     <p>{!! $course->description !!}</p>
                 </div>
@@ -407,22 +407,58 @@
                     <h2>Course Topics</h2>
                     <div class="topics-list">
                         @php
-                            $topics = collect(str_getcsv(strip_tags($course->topics), ','))->map(function ($topic, $index) {
-                                return ['id' => $index + 1, 'title' => trim($topic), 'duration' => '30 min'];
-                            });   
+                            // Parse the HTML content to extract list items
+                            $dom = new DOMDocument();
+                            @$dom->loadHTML($course->topics);
+                            $listItems = $dom->getElementsByTagName('li');
+                            $topics = [];
+                            
+                            foreach ($listItems as $index => $li) {
+                                $topics[] = [
+                                    'id' => $index + 1,
+                                    'title' => trim($li->textContent),
+                                    'duration' => '30 min' // You can customize this if needed
+                                ];
+                            }
+                            
+                            // If no list items found, try to extract from plain text
+                            if (empty($topics)) {
+                                $plainText = strip_tags($course->topics);
+                                $lines = preg_split('/\r\n|\r|\n/', $plainText);
+                                
+                                foreach ($lines as $index => $line) {
+                                    $line = trim($line);
+                                    if (!empty($line)) {
+                                        $topics[] = [
+                                            'id' => $index + 1,
+                                            'title' => $line,
+                                            'duration' => '30 min'
+                                        ];
+                                    }
+                                }
+                            }
                         @endphp
-                        @foreach ($topics as $topic)
-                            <a href="#" class="topic-item">
+                        
+                        @if (!empty($topics))
+                            @foreach ($topics as $topic)
+                                <a href="#" class="topic-item">
+                                    <div class="topic-info">
+                                        <span class="topic-number">{{ $topic['id'] }}</span>
+                                        <h4>{{ $topic['title'] }}</h4>
+                                    </div>
+                                    <div class="topic-meta">
+                                        <span class="topic-duration">{{ $topic['duration'] }}</span>
+                                    </div>
+                                </a>
+                            @endforeach
+                        @else
+                            <div class="topic-item">
                                 <div class="topic-info">
-                                    <span class="topic-number">{{ $topic['id'] }}</span>
-                                    <h4>{{ $topic['title'] }}</h4>
+                                    <span class="topic-number">1</span>
+                                    <h4>No topics available</h4>
                                 </div>
-                                <div class="topic-meta">
-                                    <span class="topic-duration">{{ $topic['duration'] }}</span>
-                                </div>
-                            </a>
-                            <br>
-                        @endforeach
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

@@ -211,20 +211,27 @@
         color: #155724;
         border: 1px solid #c3e6cb;
     }
+    
 </style>
 
- <div class="form-container">
-      <form id="courseForm" 
-      action="{{ isset($course) ? route('courses.update', $course->id) : route('courses.store') }}" 
-      method="POST" 
-      enctype="multipart/form-data">
-    @csrf
-    @if(isset($course))
-        @method('PUT')
-        <input type="hidden" id="courseId" value="{{ $course->id }}">
-    @endif
+<div class="container">
+    <h1>
+        {{ isset($course) ? 'Edit Course' : 'Add New Course' }}
+        <a href="{{ route('admin.course') }}" class="close-form">Cancel</a>
+    </h1>
+
+    <div class="form-container">
+        <form id="courseForm" 
+              action="{{ isset($course) ? route('courses.update', $course->id) : route('courses.store') }}" 
+              method="POST" 
+              enctype="multipart/form-data">
+            @csrf
+            @if(isset($course))
+                @method('PUT')
+                <input type="hidden" id="courseId" value="{{ $course->id }}">
+            @endif
+            
             <div class="form-grid">
-        
                 <div class="form-group">
                     <label for="title">Course Title</label>
                     <input type="text" id="title" name="title" class="form-control" 
@@ -309,7 +316,7 @@
                         id="description" 
                         class="editor-content" 
                         contenteditable="true"
-                        oninput="updateHiddenInput('description', 'hiddenDescription')"
+                        oninput="debouncedUpdateHiddenInput('description', 'hiddenDescription')"
                     >{!! old('description', $course->description ?? '') !!}</div>
                     <input type="hidden" id="hiddenDescription" name="description" value="{{ old('description', $course->description ?? '') }}">
                 </div>
@@ -341,7 +348,7 @@
                         id="topics" 
                         class="editor-content" 
                         contenteditable="true"
-                        oninput="processTopicsInput()"
+                        oninput="debouncedUpdateHiddenInput('topics', 'hiddenTopics')"
                     >{!! old('topics', $course->topics ?? '') !!}</div>
                     <input type="hidden" id="hiddenTopics" name="topics" value="{{ old('topics', $course->topics ?? '') }}">
                 </div>
@@ -414,22 +421,111 @@
         </form>
     </div>
 </div>
-<script>
 
+<script>
     // Log course data if in edit mode
     @if(isset($course))
         console.log('Course data loaded:');
         console.log(@json($course));
     @endif
 
+    // Save cursor position before updating content
+    function saveCursorPosition(editorId) {
+        const editor = document.getElementById(editorId);
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const preCaretRange = range.cloneRange();
+            preCaretRange.selectNodeContents(editor);
+            preCaretRange.setEnd(range.endContainer, range.endOffset);
+            const cursorPosition = preCaretRange.toString().length;
+            
+            return {
+                cursorPosition: cursorPosition,
+                range: range
+            };
+        }
+        return null;
+    }
+
+    // Restore cursor position after updating content
+    function restoreCursorPosition(editorId, savedPosition) {
+        if (!savedPosition) return;
+        
+        const editor = document.getElementById(editorId);
+        const textNodes = getTextNodes(editor);
+        let charCount = 0;
+        let foundNode = null;
+        let foundOffset = 0;
+        
+        for (const node of textNodes) {
+            const nodeLength = node.textContent.length;
+            if (savedPosition.cursorPosition <= charCount + nodeLength) {
+                foundNode = node;
+                foundOffset = savedPosition.cursorPosition - charCount;
+                break;
+            }
+            charCount += nodeLength;
+        }
+        
+        if (foundNode) {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.setStart(foundNode, foundOffset);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            editor.focus();
+        }
+    }
+
+    // Get all text nodes within an element
+    function getTextNodes(element) {
+        const textNodes = [];
+        const walker = document.createTreeWalker(
+            element, 
+            NodeFilter.SHOW_TEXT, 
+            null, 
+            false
+        );
+        
+        let node;
+        while (node = walker.nextNode()) {
+            textNodes.push(node);
+        }
+        
+        return textNodes;
+    }
+
+    // Debounced function to update hidden input
+    function debouncedUpdateHiddenInput(editorId, hiddenInputId) {
+        // Clear any existing timeout
+        if (window[`${editorId}Timeout`]) {
+            clearTimeout(window[`${editorId}Timeout`]);
+        }
+        
+        // Save cursor position before updating
+        const cursorPosition = saveCursorPosition(editorId);
+        
+        // Set a new timeout to update after a short delay
+        window[`${editorId}Timeout`] = setTimeout(() => {
+            updateHiddenInput(editorId, hiddenInputId);
+            
+            // Restore cursor position after update
+            if (cursorPosition) {
+                restoreCursorPosition(editorId, cursorPosition);
+            }
+        }, 300); // 300ms delay
+    }
+
     // Text formatting functions
     function formatText(editorId, command, value = null) {
         const editor = document.getElementById(editorId);
         editor.focus();
         document.execCommand(command, false, value);
-        if (editorId === 'topics') {
-            updateHiddenInput('topics', 'hiddenTopics');
-        }
+        
+        // Update the hidden input after formatting
+        updateHiddenInput(editorId, editorId === 'topics' ? 'hiddenTopics' : 'hiddenDescription');
     }
     
     // Add a new numbered topic
@@ -450,36 +546,15 @@
         updateHiddenInput('topics', 'hiddenTopics');
     }
     
-    // Process topics input to create numbered list
-    function processTopicsInput() {
-        const editor = document.getElementById('topics');
-        const text = editor.innerText.trim();
-        
-        const topics = text.split(/[\n,]+/).map(topic => topic.trim()).filter(topic => topic !== '');
-        
-        if (topics.length > 0) {
-            let html = '<ol>';
-            topics.forEach(topic => {
-                html += `<li>${topic}</li>`;
-            });
-            html += '</ol>';
-            editor.innerHTML = html;
-        } else {
-            editor.innerHTML = '';
-        }
-        
-        updateHiddenInput('topics', 'hiddenTopics');
-    }
-    
     // Set color for text or background
     function setColor(editorId, command, color) {
         const editor = document.getElementById(editorId);
         editor.focus();
         document.execCommand(command, false, color);
         hideAllColorOptions();
-        if (editorId === 'topics') {
-            updateHiddenInput('topics', 'hiddenTopics');
-        }
+        
+        // Update the hidden input after color change
+        updateHiddenInput(editorId, editorId === 'topics' ? 'hiddenTopics' : 'hiddenDescription');
     }
     
     // Toggle color options visibility
@@ -526,51 +601,45 @@
     
     // Form submission handler
     document.getElementById('courseForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    updateHiddenInput('description', 'hiddenDescription');
-    updateHiddenInput('topics', 'hiddenTopics');
+        // Update hidden inputs before submission
+        updateHiddenInput('description', 'hiddenDescription');
+        updateHiddenInput('topics', 'hiddenTopics');
 
-    const formData = new FormData(this);
-    const url = this.action;
-    let method = this.querySelector('input[name="_method"]') 
-                  ? this.querySelector('input[name="_method"]').value 
-                  : 'POST';
+        const formData = new FormData(this);
+        const url = this.action;
+        let method = this.querySelector('input[name="_method"]') 
+                    ? this.querySelector('input[name="_method"]').value 
+                    : 'POST';
 
-    console.log('Submitting form to:', url);
-    console.log('Method:', method);
+        console.log('Submitting form to:', url);
+        console.log('Method:', method);
 
-    fetch(url, {
-        method: method,
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Accept': 'application/json'
-        }
-    })
-    .then(async response => {
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Success:', data);
-        window.location.href = '{{ route('admin.course') }}';
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert(`An error occurred while ${document.getElementById('courseId')?.value ? 'updating' : 'saving'} the course: ${error.message}`);
+        fetch(url, {
+            method: method,
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(async response => {
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            window.location.href = '{{ route('admin.course') }}';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(`An error occurred while ${document.getElementById('courseId')?.value ? 'updating' : 'saving'} the course: ${error.message}`);
+        });
     });
-});
-
-
-    // Check if we're in edit mode and log data
-    @if(isset($course))
-        console.log('Course data loaded:');
-        console.log(@json($course));
-    @endif
 </script>
 
 @endsection

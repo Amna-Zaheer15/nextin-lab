@@ -31,15 +31,19 @@
         background: #00695C;
         color: white;
         border: none;
-        padding: 10px 20px;
+        padding: 10px;
         font-size: 16px;
         border-radius: 4px;
         cursor: pointer;
         transition: background 0.3s;
         text-decoration: none;
+        line-height: 1;
     }
     .add-course-btn:hover {
         background: #004D40;
+    }
+    .add-course-btn i {
+        font-size: 18px;
     }
     table {
         width: 100%;
@@ -64,18 +68,29 @@
     }
     .actions {
         white-space: nowrap;
+        
     }
     .actions a, .actions button {
         margin-right: 5px;
-        padding: 6px 12px;
-        font-size: 14px;
+        padding: 6px;
+        font-size: 16px;
         border-radius: 3px;
         cursor: pointer;
         transition: all 0.2s;
         text-decoration: none;
+        display: inline-block;
+        line-height: 1;
+    }
+    .view {
+        background: #02d1d1ff;
+        color: white;
+        border: none;
+    }
+    .view:hover {
+        background: #0277BD;
     }
     .edit {
-        background: #FF8A65;
+        background: #078af5ff;
         color: white;
         border: none;
     }
@@ -89,6 +104,9 @@
     }
     .delete:hover {
         background: #c82333;
+    }
+    .actions i {
+        font-size: 16px;
     }
     .course-thumbnail {
         width: 100px;
@@ -122,10 +140,15 @@
     }
 </style>
 
+<!-- Include Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <div class="container">
     <h1>
         Courses Management
-        <a href="{{ route('courses.create') }}" class="add-course-btn">Add New Course</a>
+        <a href="{{ route('courses.create') }}" class="add-course-btn" title="Add New Course">
+            <i class="fas fa-plus"></i>
+        </a>
     </h1>
 
     <!-- Success Message Alert -->
@@ -219,10 +242,17 @@
                     // Actions column
                     const actionsCell = document.createElement('td');
                     actionsCell.className = 'actions';
-                   actionsCell.innerHTML = `
-                        <a class="edit" href="${"{{ route('courses.edit', ':id') }}".replace(':id', course.id)}">Edit</a>
-                       <button class="delete" onclick="deleteCourse(${course.id})">Delete</button>
-                          `;
+                    actionsCell.innerHTML = `
+                        <a class="view" href="${"{{ route('courses.show', ':id') }}".replace(':id', course.id)}" title="View">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a class="edit" href="${"{{ route('courses.edit', ':id') }}".replace(':id', course.id)}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button class="delete" onclick="deleteCourse(${course.id})" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
                     
                     row.appendChild(thumbnailCell);
                     row.appendChild(detailsCell);
