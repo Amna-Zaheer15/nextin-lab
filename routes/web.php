@@ -103,7 +103,6 @@ Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])->name('pr
 
 
 
-
 // templates 
 // Route::get('/admintemplates', [TemplateController::class, 'get'])->name('admin.templates');
 
