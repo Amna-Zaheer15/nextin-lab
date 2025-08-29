@@ -107,14 +107,13 @@
         
         .project-card {
             background: var(--card-background);
-          
             overflow: hidden;
             box-shadow: 0 2px 4px var(--shadow);
             transition: transform 0.3s ease;
-            max-height: 400px; /* Fixed height for all cards */
+            max-height: 400px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Ensures content and footer align properly */
+            justify-content: space-between;
         }
         
         .project-card:hover {
@@ -122,20 +121,23 @@
         }
         
         .project-image {
-            height: 150px; /* Uniform height for all images */
+            height: 150px;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .project-title a{
-         list-style: none;
-         color:#00695C;
+        
+        .project-title a {
+            list-style: none;
+            color: #00695C;
+            text-decoration: none;
         }
+        
         .project-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Maintains aspect ratio and fills space */
+            object-fit: cover;
             transition: transform 0.3s;
         }
         
@@ -178,7 +180,7 @@
         
         .project-content {
             padding: 1rem;
-            flex-grow: 1; /* Allows content to take available space */
+            flex-grow: 1;
         }
         
         .project-title {
@@ -200,7 +202,7 @@
             justify-content: space-between;
             align-items: center;
             border-top: 1px solid var(--card-border);
-            min-height: 60px; /* Fixed minimum height to align buttons */
+            min-height: 60px;
         }
         
         .project-stats {
@@ -226,7 +228,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.3s;
-            min-width: 100px; /* Ensures uniform button width */
+            min-width: 100px;
             text-align: center;
         }
         
@@ -281,10 +283,19 @@
                 max-width: 100%;
             }
         }
-    </style>
 
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+    </style>
+@php
+    $projectData = \App\Models\Project::where('status', 'active')->get();
+@endphp
     <div class="container">
-        <h1 class="page-title">Code Projects</h1>
+        <h1 class="page-title">Projects</h1>
         
         <div class="search-bar">
             <input type="text" id="searchInput" placeholder="Search">
@@ -294,234 +305,45 @@
             <button class="filter-btn active">All Projects</button>
             <button class="filter-btn">Node.js</button>
             <button class="filter-btn">LaravelPHP</button>
-            <button class="filter-btn">React</button>
+            <button class="filter-btn">PHP</button>
             <button class="filter-btn">Free</button>
             <button class="filter-btn">Premium</button>
         </div>
         
-        <div class="projects-grid">
-            <!-- Project 1 -->
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/student-app-:-nodejs-expressjs-&-mongodb-crud-api-project.png" alt="Student App">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> NodeJS</div>
-                    <div class="project-price">Free</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"><a href="/projectdetails">Student App : NodeJS ExpressJS & MongoDB CRUD API Project</a></h3>
-                <!-- <h3 class="project-title">Student App : NodeJS ExpressJS & MongoDB CRUD API Project</h3> -->
-                    <p class="project-desc"> The Students CRUD App is a web-based application...</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 2</span>
-                        <span><i class="fas fa-download"></i> 273</span>
+        <div class="projects-grid" id="projects-container">
+            @forelse ($projectData as $project)
+                <div class="project-card {{ $project->price > 0 ? 'paid' : '' }}">
+                    <div class="project-image">
+                        <img src="{{ $project->image_url }}" alt="{{ $project->title }}">
                     </div>
-                    <button class="download-btn">Download</button>
-                </div>
-            </div>
-
-            <!-- Project 2 -->
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/contact-app-:-nodejs-expressjs-&-mongodb-crud-project.png" alt="Contact App">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> NodeJS</div>
-                    <div class="project-price">Free</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"> <a href="/projectdetails">Contact App : NodeJS ExpressJS & MongoDB CRUD Project </a></h3>
-                    <p class="project-desc">In this new project you will get the code of complete nodejs, expressjs and mon...</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 2</span>
-                        <span><i class="fas fa-download"></i> 413</span>
+                    <div class="project-header">
+                        <div class="project-category">
+                            <i class="fas fa-code"></i>
+                            {{ $project->technology }}
+                        </div>
+                        <div class="project-price">
+                            ${{ $project->price }}
+                        </div>
                     </div>
-                    <button class="download-btn">Download</button>
-                </div>
-            </div>
-
-            <!-- Project 3 -->
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/contact-app-html-template.png" alt="Contact App HTML Template">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> HTML</div>
-                    <div class="project-price">Free</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"><a href="/projectdetails"> Contact App HTML Template </a></h3>
-                    <p class="project-desc">Responsive contact form with validation for websites.</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 9</span>
-                        <span><i class="fas fa-download"></i> 672</span>
+                    <div class="project-content">
+                        <h3 class="project-title">
+                            <a href="#">{{ $project->title }}</a>
+                        </h3>
+                        <p class="project-desc">
+                            {{ $project->short_description }}
+                        </p>
                     </div>
-                    <button class="download-btn">Download</button>
-                </div>
-            </div>
-
-            <!-- Project 4 -->
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/news-blog-project-in-nodejs,-expressjs-&-mongodb.png" alt="News Blog Project">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> NodeJS</div>
-                    <div class="project-price">Free</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"> <a href="/projectdetails">News Blog Project in NodeJS, ExpressJS & MongoDB </a></h3>
-                    <p class="project-desc">Manage news articles with categories and tags using NodeJS.</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 17</span>
-                        <span><i class="fas fa-download"></i> 553</span>
+                    <div class="project-footer">
+                        <div class="project-stats">
+                            <span><i class="fas fa-download"></i> {{ $project->downloads }}</span>
+                            <span><i class="fas fa-shopping-cart"></i> {{ $project->purchases }}</span>
+                        </div>
+                        <button class="download-btn">Download</button>
                     </div>
-                    <button class="download-btn">Download</button>
                 </div>
-            </div>
-
-            <!-- Project 5 -->
-            <div class="project-card paid">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/school-management-project-in-laravel.jpg" alt="School Management Project">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> LaravelPHP</div>
-                    <div class="project-price">₹350</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"><a href="/projectdetails">School Management Project in Laravel
-                        </a>
-                    </h3>
-                    <p class="project-desc">Automates school operations like student management and grading.</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 130</span>
-                        <span><i class="fas fa-download"></i> 223</span>
-                    </div>
-                    <button class="download-btn">Purchase</button>
-                </div>
-            </div>
-
-            <!-- Project 6 -->
-            <div class="project-card paid">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/digital-products-selling-project-in-laravel.jpg" alt="Digital Products Selling">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> LaravelPHP</div>
-                    <div class="project-price">₹250</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"> <a href="/projectdetails">Digital Products Selling Project in Laravel </a></h3>
-                    <p class="project-desc">Multi-vendor platform for selling digital products with payment integration.</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 98</span>
-                        <span><i class="fas fa-download"></i> 190</span>
-                    </div>
-                    <button class="download-btn">Purchase</button>
-                </div>
-            </div>
-
-            <!-- Project 7 -->
-            <div class="project-card paid">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/tourism-management-project-in-laravel.png" alt="Tourism Management">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> LaravelPHP</div>
-                    <div class="project-price">₹250</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"><a href="/projectdetails">Tourism Management Project in Laravel </a></h3>
-                    <p class="project-desc">Manages tours, bookings, and customer relationships for tourism businesses.</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 694</span>
-                        <span><i class="fas fa-download"></i> 195</span>
-                    </div>
-                    <button class="download-btn">Purchase</button>
-                </div>
-            </div>
-
-            <!-- Project 8 -->
-            <div class="project-card paid">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/resume-management-project-in-laravel.jpg" alt="Resume Management">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> LaravelPHP</div>
-                    <div class="project-price">₹250</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"><a href="/projectdetails">Resume Management Project in Laravel </a></h3>
-                    <p class="project-desc">Create professional resumes with personal and professional details.</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 12</span>
-                        <span><i class="fas fa-download"></i> 159</span>
-                    </div>
-                    <button class="download-btn">Purchase</button>
-                </div>
-            </div>
-
-            <!-- Project 9 -->
-            <div class="project-card paid">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/beauty-salon-project-in-laravel.png" alt="Beauty Salon Project">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> LaravelPHP</div>
-                    <div class="project-price">₹250</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"><a href="/projectdetails">Beauty Salon Project in Laravel </a></h3>
-                    <p class="project-desc">Manages appointments, staff, and services for beauty salons.</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 42</span>
-                        <span><i class="fas fa-download"></i> 213</span>
-                    </div>
-                    <button class="download-btn">Purchase</button>
-                </div>
-            </div>
-
-            <!-- Project 10 -->
-            <div class="project-card paid">
-                <div class="project-image">
-                    <img src="https://www.yahubaba.com/public/projects/ecommerce-project-in-laravel-&-inertia-js.png" alt="Ecommerce Project">
-                </div>
-                <div class="project-header">
-                    <div class="project-category"><i class="fas fa-cube"></i> React Js LaravelPHP</div>
-                    <div class="project-price">₹300</div>
-                </div>
-                <div class="project-content">
-                    <h3 class="project-title"><a href="/projectdetails">Ecommerce Project in Laravel & Inertia Js </a> </h3>
-                    <p class="project-desc">E-commerce platform with Inertia.js and React for seamless shopping.</p>
-                </div>
-                <div class="project-footer">
-                    <div class="project-stats">
-                        <span><i class="fas fa-comment"></i> 25</span>
-                        <span><i class="fas fa-download"></i> 150</span>
-                    </div>
-                    <button class="download-btn">Purchase</button>
-                </div>
-            </div>
+            @empty
+                <div class="loading">No projects found.</div>
+            @endforelse
         </div>
         
         <div class="pagination">
@@ -532,54 +354,5 @@
             <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const projectCards = document.querySelectorAll('.project-card');
 
-            searchInput.addEventListener('input', function() {
-                const searchTerm = searchInput.value.toLowerCase().trim();
-
-                projectCards.forEach(card => {
-                    const title = card.querySelector('.project-title').textContent.toLowerCase();
-                    const category = card.querySelector('.project-category').textContent.toLowerCase().replace('cube', '').trim();
-
-                    if (title.includes(searchTerm) || category.includes(searchTerm)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-
-            const cards = document.querySelectorAll('.project-card');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                });
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(button => {
-                button.addEventListener('mousedown', function() {
-                    this.style.transform = 'translateY(2px)';
-                });
-                button.addEventListener('mouseup', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-        });
-    </script>
 @endsection
